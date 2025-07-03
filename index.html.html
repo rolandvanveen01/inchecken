@@ -145,21 +145,22 @@
         async function fetchGifsAndBuildGrid() {
             const choicesDiv = document.getElementById('choices');
             const choicesTitle = document.getElementById('choices-title');
-            choicesDiv.innerHTML = '<p>Een boeket aan GIFs wordt samengesteld...</p>';
+            choicesDiv.innerHTML = '<p>Een radicaal boeket aan GIFs wordt samengesteld...</p>';
             choicesTitle.innerText = 'Kies jouw GIF uit de mix van vandaag';
 
             try {
-                // --- START WIJZIGING: Simpele Random ID ---
-                // Deze methode werkt in elke context (ook lokaal) en is robuuster.
-                const randomId = Date.now().toString() + Math.random().toString();
-                // --- EINDE WIJZIGING ---
-                
-                console.log('GIPHY Random ID voor deze sessie:', randomId);
-
                 const limitPerTheme = Math.floor(totalGifs / bouquetThemes.length);
 
                 const apiCalls = bouquetThemes.map(theme => {
-                    const url = `https://api.giphy.com/v1/gifs/search?q=${encodeURIComponent(theme)}&api_key=${giphyApiKey}&limit=${limitPerTheme}&rating=g&lang=nl&random_id=${randomId}`;
+                    // --- START RADICALE WIJZIGING: Random Offset ---
+                    // 1. Genereer een willekeurig startpunt (offset) voor ELKE zoekopdracht.
+                    // We zoeken dieper in de archieven, tot 200 resultaten diep.
+                    const randomOffset = Math.floor(Math.random() * 200);
+
+                    // 2. Voeg de 'offset' parameter toe aan de URL. De 'random_id' is verwijderd.
+                    const url = `https://api.giphy.com/v1/gifs/search?q=${encodeURIComponent(theme)}&api_key=${giphyApiKey}&limit=${limitPerTheme}&rating=g&lang=nl&offset=${randomOffset}`;
+                    console.log(`Zoeken naar: ${theme} met offset: ${randomOffset}`);
+                    // --- EINDE RADICALE WIJZIGING ---
                     return fetch(url);
                 });
 

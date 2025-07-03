@@ -132,91 +132,10 @@
         const database = firebase.database();
         const submissionsRef = database.ref('submissions');
 
-        // =======================================================================
-        // --- START 'BOEKET'-LOGICA ---
-        // =======================================================================
-
-        // De kernthema's voor ons boeket.
         const bouquetThemes = ['blij', 'verdrietig', 'verward', 'feest', 'moe', 'geconcentreerd'];
-        const totalGifs = 30; // Zorg dat dit deelbaar is door het aantal thema's
+        const totalGifs = 30;
 
-        // Hulpfunctie om een array willekeurig te schudden
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]]; // Wissel elementen
-            }
-        }
-
-        async function fetchGifsAndBuildGrid() {
-            const choicesDiv = document.getElementById('choices');
-            const choicesTitle = document.getElementById('choices-title');
-            choicesDiv.innerHTML = '<p>Een boeket aan GIFs wordt samengesteld...</p>';
-            // De titel is nu altijd hetzelfde, omdat het een mix is.
-            choicesTitle.innerText = 'Kies jouw GIF uit de mix van vandaag';
-
-            try {
-                const limitPerTheme = Math.floor(totalGifs / bouquetThemes.length);
-
-                const apiCalls = bouquetThemes.map(theme => {
-                    const url = `https://api.giphy.com/v1/gifs/search?q=${encodeURIComponent(theme)}&api_key=${giphyApiKey}&limit=${limitPerTheme}&rating=g&lang=nl`;
-                    return fetch(url);
-                });
-
-                const responses = await Promise.all(apiCalls);
-                const jsonResults = await Promise.all(responses.map(res => res.json()));
-                let allGifs = jsonResults.flatMap(result => result.data);
-
-                shuffleArray(allGifs);
-
-                choicesDiv.innerHTML = '';
-                allGifs.forEach(gifObject => {
-                    const img = document.createElement('img');
-                    img.src = gifObject.images.fixed_height.url;
-                    img.className = 'choice-img';
-                    const fullSizeUrl = gifObject.images.original.url;
-                    img.onclick = () => selectImage(fullSizeUrl);
-                    choicesDiv.appendChild(img);
-                });
-
-            } catch (error) {
-                console.error("Kon geen boeket aan GIFs ophalen:", error);
-                choicesDiv.innerHTML = '<p>Oeps, kon de GIF\'s niet laden. Check of de GIPHY API sleutel klopt.</p>';
-            }
-        }
-        // =======================================================================
-        // --- EINDE 'BOEKET'-LOGICA ---
-        // =======================================================================
-
-        function selectImage(url) {
-            const newSubmissionRef = submissionsRef.push();
-            newSubmissionRef.set({
-                imageUrl: url,
-                timestamp: Date.now()
-            });
-            alert('Je keuze is gedeeld!');
-        }
-        submissionsRef.on('value', (snapshot) => {
-            const displayDiv = document.getElementById('central-display');
-            displayDiv.innerHTML = '';
-            const submissions = snapshot.val();
-            if (submissions) {
-                Object.values(submissions).forEach(submission => {
-                    const img = document.createElement('img');
-                    img.src = submission.imageUrl;
-                    img.className = 'display-img';
-                    displayDiv.appendChild(img);
-                });
-            } else {
-                displayDiv.innerHTML = '<p>Wachten op keuzes van het team...</p>';
-            }
-        });
-        document.getElementById('reset-button').addEventListener('click', () => {
-            if (confirm('Weet je zeker dat je alle keuzes wilt wissen voor de volgende ronde?')) {
-                submissionsRef.remove();
-            }
-        });
-        document.addEventListener('DOMContentLoaded', fetchGifsAndBuildGrid);
-    </script>
-</body>
-</html>
+                [array[i], array[j]] = [array
